@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Cafe - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B4513;  /* Warm brown */
+            --secondary: #F5DEB3; /* Wheat color */
+            --accent: #CD853F;   /* Peru color */
+            --light: #FFF8DC;    /* Cornsilk */
+            --dark: #5D4037;     /* Dark brown */
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .container {
+            background-color: var(--light);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 450px;
+            max-width: 95%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h2 {
+            margin-bottom: 25px;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .logo {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-star {
+            color: var(--warning);
+            font-size: 24px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+        
+        input[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        input[type="submit"]:hover {
+            background-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin: -10px 0 15px;
+            text-align: left;
+            display: none;
+        }
+        
+        .error-message.active {
+            display: block;
+        }
+        
+        .loading-spinner {
+            display: none;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .links-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .link {
+            color: var(--dark);
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+        
+        .link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 2;
+        }
+        
+        .back-link:hover {
+            color: white;
+        }
+        
+        .success-message {
+            color: var(--success);
+            font-size: 16px;
+            margin: 20px 0;
+            font-weight: 600;
+            display: none;
+        }
+        
+        /* Decorative elements */
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(245, 222, 179, 0.1);
+        }
+        
+        .circle-1 {
+            width: 200px;
+            height: 200px;
+            top: -50px;
+            left: -50px;
+        }
+        
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -100px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background-color: var(--success);
+        }
+        
+        .toast.error {
+            background-color: var(--danger);
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                width: 90%;
+            }
+            
+            .links-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Decorative circles -->
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+
+    <div class="container">
+        <div class="logo">
+            <div class="logo-star">&#9733;</div>
+            <div class="logo-text">CAMPUS CAFE</div>
+        </div>
+        
+        <h2>Login to Your Account</h2>
+        
+        <div class="success-message" id="successMessage"></div>
+        
+        <form id="loginForm">
+            <input type="email" id="email" name="email" placeholder="Email Address" required>
+            <span class="error-message" id="emailError"></span>
+
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <span class="error-message" id="passwordError"></span>
+
+            <input type="submit" value="Login">
+            <div class="loading-spinner" id="loadingSpinner"></div>
+        </form>
+        
+        <div class="links-container">
+            <a href="Register.html" class="link">Create an account</a>
+            <a href="forget.html" class="link">Forgot password?</a>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // DOM Elements
+        const loginForm = document.getElementById("loginForm");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const loadingSpinner = document.getElementById("loadingSpinner");
+        const successMessage = document.getElementById("successMessage");
+        const toast = document.getElementById("toast");
+        
+        // Event Listeners
+        emailInput.addEventListener("input", validateEmail);
+        passwordInput.addEventListener("input", validatePassword);
+        loginForm.addEventListener("submit", handleLogin);
+        
+        // Validation Functions
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email.length === 0) {
+                showError(emailError, "Email is required");
+                return false;
+            }
+            
+            if (!emailPattern.test(email)) {
+                showError(emailError, "Please enter a valid email address");
+                return false;
+            }
+            
+            hideError(emailError);
+            return true;
+        }
+        
+        function validatePassword() {
+            const password = passwordInput.value;
+            
+            if (password.length === 0) {
+                showError(passwordError, "Password is required");
+                return false;
+            }
+            
+            hideError(passwordError);
+            return true;
+        }
+        
+        function showError(element, message) {
+            element.textContent = message;
+            element.classList.add("active");
+        }
+        
+        function hideError(element) {
+            element.textContent = "";
+            element.classList.remove("active");
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Form Submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            
+            if (isEmailValid && isPasswordValid) {
+                authenticateUser();
+            }
+        }
+        
+        function authenticateUser() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            loadingSpinner.style.display = "block";
+            
+            // Simulate API call with timeout
+            setTimeout(() => {
+                // Get registered users from localStorage
+                const users = JSON.parse(localStorage.getItem("users")) || [];
+                
+                // Find user with matching email
+                const user = users.find(user => user.email === email);
+                
+                if (!user) {
+                    loadingSpinner.style.display = "none";
+                    showError(emailError, "Email not registered");
+                    showToast("Email not found", "error");
+                    return;
+                }
+                
+                // Check password (in a real app, this would be hashed)
+                if (user.password !== password) {
+                    loadingSpinner.style.display = "none";
+                    showError(passwordError, "Incorrect password");
+                    showToast("Incorrect password", "error");
+                    return;
+                }
+                
+                // Login successful - set current user
+                localStorage.setItem("currentUser", JSON.stringify({
+                    username: user.username,
+                    email: user.email
+                }));
+                
+                // Show success and redirect
+                loadingSpinner.style.display = "none";
+                loginForm.style.display = "none";
+                successMessage.textContent = "Login successful! Redirecting...";
+                successMessage.style.display = "block";
+                showToast("Login successful", "success");
+                
+                setTimeout(() => {
+                    window.location.href = "items.html";
+                }, 1500);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

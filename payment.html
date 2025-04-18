@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Cafe - Payment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B4513;  /* Warm brown */
+            --secondary: #F5DEB3; /* Wheat color */
+            --accent: #CD853F;   /* Peru color */
+            --light: #FFF8DC;    /* Cornsilk */
+            --dark: #5D4037;     /* Dark brown */
+            --text: #333;
+            --white: #fff;
+            --danger: #dc3545;
+            --success: #28a745;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            background-color: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-star {
+            font-size: 24px;
+            color: var(--secondary);
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--white);
+        }
+        
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background-color: var(--primary);
+        }
+        
+        /* Main Content Styles */
+        .container {
+            max-width: 800px;
+            margin: 100px auto 30px;
+            padding: 20px;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark);
+            font-size: 2rem;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: var(--accent);
+        }
+        
+        .payment-container {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .order-summary {
+            margin-bottom: 30px;
+        }
+        
+        .order-summary h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .order-items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .order-items th, .order-items td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--secondary);
+        }
+        
+        .order-items th {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .order-total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+        
+        /* Delivery Address Styles */
+        .delivery-address {
+            margin-bottom: 30px;
+        }
+        
+        .delivery-address h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .delivery-note {
+            background-color: rgba(139, 69, 19, 0.1);
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .address-form {
+            margin-top: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            height: 80px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .form-group.invalid input,
+        .form-group.invalid select,
+        .form-group.invalid textarea {
+            border-color: var(--danger);
+        }
+        
+        .form-group.invalid .error-message {
+            display: block;
+        }
+        
+        /* Payment Methods Styles */
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+        
+        .payment-methods h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .payment-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            border-color: var(--accent);
+        }
+        
+        .payment-option input {
+            margin-right: 15px;
+        }
+        
+        .payment-option i {
+            font-size: 24px;
+            margin-right: 15px;
+            color: var(--primary);
+        }
+        
+        .payment-option.active {
+            border-color: var(--accent);
+            background-color: rgba(205, 133, 63, 0.1);
+        }
+        
+        .payment-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: rgba(245, 222, 179, 0.2);
+        }
+        
+        .payment-form.active {
+            display: block;
+        }
+        
+        .card-details {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .card-details .form-group {
+            flex: 1;
+        }
+        
+        /* Pay Button Styles */
+        .pay-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .pay-btn:hover {
+            background-color: var(--accent);
+        }
+        
+        .pay-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background-color: var(--success);
+        }
+        
+        .toast.error {
+            background-color: var(--danger);
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 80px;
+                padding: 15px;
+            }
+            
+            .payment-container {
+                padding: 20px;
+            }
+            
+            .card-details, .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-star">&#9733;</div>
+            <div class="logo-text">CAMPUS CAFE</div>
+        </div>
+        <div class="nav-controls">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i> Back to Menu
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">Payment</h1>
+        
+        <div class="payment-container">
+            <div class="order-summary">
+                <h3>Order Summary</h3>
+                <table class="order-items" id="orderItems">
+                    <!-- Order items will be populated from cart -->
+                </table>
+                <div class="order-total">
+                    Total: <span id="orderTotal">R0.00</span>
+                </div>
+            </div>
+            
+            <div class="delivery-address">
+                <h3>Delivery Address</h3>
+                <div class="delivery-note">
+                    <strong>Note:</strong> We currently only deliver within Durban CBD area (within 5km radius of our cafe)
+                </div>
+                
+                <div class="address-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="streetAddress">Street Address*</label>
+                            <input type="text" id="streetAddress" placeholder="123 Smith Street">
+                            <span class="error-message" id="streetAddressError">Please enter your street address</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="unitNumber">Unit/Building Number</label>
+                            <input type="text" id="unitNumber" placeholder="Unit 5, Building B">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="suburb">Suburb*</label>
+                            <input type="text" id="suburb" placeholder="Durban CBD">
+                            <span class="error-message" id="suburbError">Please enter your suburb</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code*</label>
+                            <input type="text" id="postalCode" placeholder="4001">
+                            <span class="error-message" id="postalCodeError">Please enter a valid postal code</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="deliveryInstructions">Delivery Instructions</label>
+                        <textarea id="deliveryInstructions" placeholder="Building security code, landmarks, etc."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactNumber">Contact Number*</label>
+                        <input type="tel" id="contactNumber" placeholder="082 123 4567">
+                        <span class="error-message" id="contactNumberError">Please enter a valid phone number</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="payment-methods">
+                <h3>Payment Method</h3>
+                
+                <div class="payment-option" id="cashOption">
+                    <input type="radio" name="paymentMethod" id="cash" value="cash">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <label for="cash">Cash on Delivery</label>
+                </div>
+                
+                <div class="payment-option" id="cardOption">
+                    <input type="radio" name="paymentMethod" id="card" value="card">
+                    <i class="fas fa-credit-card"></i>
+                    <label for="card">Credit/Debit Card</label>
+                </div>
+                
+                <div class="payment-form" id="cardForm">
+                    <div class="form-group">
+                        <label for="cardNumber">Card Number*</label>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                        <span class="error-message" id="cardNumberError">Please enter a valid card number</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardName">Name on Card*</label>
+                        <input type="text" id="cardName" placeholder="John Doe">
+                        <span class="error-message" id="cardNameError">Please enter the name on card</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="form-group">
+                            <label for="expiryDate">Expiry Date*</label>
+                            <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                            <span class="error-message" id="expiryDateError">Please enter a valid expiry date</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV*</label>
+                            <input type="text" id="cvv" placeholder="123" maxlength="3">
+                            <span class="error-message" id="cvvError">Please enter a valid CVV</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="pay-btn" id="payBtn" disabled>Complete Order</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // DOM Elements
+        const backBtn = document.getElementById('backBtn');
+        const orderItems = document.getElementById('orderItems');
+        const orderTotal = document.getElementById('orderTotal');
+        const streetAddress = document.getElementById('streetAddress');
+        const unitNumber = document.getElementById('unitNumber');
+        const suburb = document.getElementById('suburb');
+        const postalCode = document.getElementById('postalCode');
+        const deliveryInstructions = document.getElementById('deliveryInstructions');
+        const contactNumber = document.getElementById('contactNumber');
+        const cashOption = document.getElementById('cashOption');
+        const cardOption = document.getElementById('cardOption');
+        const cardForm = document.getElementById('cardForm');
+        const cardNumber = document.getElementById('cardNumber');
+        const cardName = document.getElementById('cardName');
+        const expiryDate = document.getElementById('expiryDate');
+        const cvv = document.getElementById('cvv');
+        const payBtn = document.getElementById('payBtn');
+        const toast = document.getElementById('toast');
+        
+        // Error message elements
+        const streetAddressError = document.getElementById('streetAddressError');
+        const suburbError = document.getElementById('suburbError');
+        const postalCodeError = document.getElementById('postalCodeError');
+        const contactNumberError = document.getElementById('contactNumberError');
+        const cardNumberError = document.getElementById('cardNumberError');
+        const cardNameError = document.getElementById('cardNameError');
+        const expiryDateError = document.getElementById('expiryDateError');
+        const cvvError = document.getElementById('cvvError');
+        
+        // Payment data
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let totalPrice = parseFloat(localStorage.getItem('totalPrice')) || 0;
+        let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        let selectedPaymentMethod = null;
+        let isFormValid = false;
+        
+        // Durban CBD postal codes (approximate)
+        const durbanCBDPostalCodes = ['4001', '4000', '4002', '4003', '4004', '4005'];
+        
+        // Initialize the page
+        function init() {
+            if (cart.length === 0) {
+                showToast('Your cart is empty', 'error');
+                setTimeout(() => {
+                    window.location.href = 'items.html';
+                }, 1500);
+                return;
+            }
+            
+            renderOrderSummary();
+            setupEventListeners();
+            setupFormValidation();
+        }
+        
+        // Render order summary
+        function renderOrderSummary() {
+            orderItems.innerHTML = '';
+            
+            // Create table header
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            `;
+            orderItems.appendChild(headerRow);
+            
+            // Add cart items
+            cart.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.quantity}</td>
+                    <td>R${item.price.toFixed(2)}</td>
+                    <td>R${(item.price * item.quantity).toFixed(2)}</td>
+                `;
+                orderItems.appendChild(row);
+            });
+            
+            // Display total
+            orderTotal.textContent = `R${totalPrice.toFixed(2)}`;
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Back button
+            backBtn.addEventListener('click', () => {
+                window.location.href = 'items.html';
+            });
+            
+            // Payment method selection
+            cashOption.addEventListener('click', () => {
+                selectedPaymentMethod = 'cash';
+                cashOption.classList.add('active');
+                cardOption.classList.remove('active');
+                cardForm.classList.remove('active');
+                validateForm();
+            });
+            
+            cardOption.addEventListener('click', () => {
+                selectedPaymentMethod = 'card';
+                cardOption.classList.add('active');
+                cashOption.classList.remove('active');
+                cardForm.classList.add('active');
+                validateForm();
+            });
+            
+            // Input validation on change
+            streetAddress.addEventListener('input', validateForm);
+            suburb.addEventListener('input', validateForm);
+            postalCode.addEventListener('input', validateForm);
+            contactNumber.addEventListener('input', validateForm);
+            cardNumber.addEventListener('input', validateForm);
+            cardName.addEventListener('input', validateForm);
+            expiryDate.addEventListener('input', validateForm);
+            cvv.addEventListener('input', validateForm);
+            
+            // Format card number input
+            cardNumber.addEventListener('input', formatCardNumber);
+            
+            // Format expiry date input
+            expiryDate.addEventListener('input', formatExpiryDate);
+            
+            // Pay button
+            payBtn.addEventListener('click', processPayment);
+        }
+        
+        // Setup form validation
+        function setupFormValidation() {
+            // Validate street address
+            streetAddress.addEventListener('blur', () => {
+                if (streetAddress.value.trim() === '') {
+                    setInvalid(streetAddress, streetAddressError, 'Please enter your street address');
+                } else {
+                    setValid(streetAddress, streetAddressError);
+                }
+                validateForm();
+            });
+            
+            // Validate suburb
+            suburb.addEventListener('blur', () => {
+                if (suburb.value.trim() === '') {
+                    setInvalid(suburb, suburbError, 'Please enter your suburb');
+                } else {
+                    setValid(suburb, suburbError);
+                }
+                validateForm();
+            });
+            
+            // Validate postal code
+            postalCode.addEventListener('blur', () => {
+                const postalCodeValue = postalCode.value.trim();
+                if (postalCodeValue === '') {
+                    setInvalid(postalCode, postalCodeError, 'Please enter your postal code');
+                } else if (!durbanCBDPostalCodes.includes(postalCodeValue)) {
+                    setInvalid(postalCode, postalCodeError, 'We currently only deliver to Durban CBD area');
+                } else {
+                    setValid(postalCode, postalCodeError);
+                }
+                validateForm();
+            });
+            
+            // Validate contact number
+            contactNumber.addEventListener('blur', () => {
+                const phoneRegex = /^0[0-9]{9}$/;
+                const phoneValue = contactNumber.value.trim().replace(/\s/g, '');
+                
+                if (phoneValue === '') {
+                    setInvalid(contactNumber, contactNumberError, 'Please enter your phone number');
+                } else if (!phoneRegex.test(phoneValue)) {
+                    setInvalid(contactNumber, contactNumberError, 'Please enter a valid South African phone number (e.g., 0821234567)');
+                } else {
+                    setValid(contactNumber, contactNumberError);
+                }
+                validateForm();
+            });
+            
+            // Validate card number
+            cardNumber.addEventListener('blur', () => {
+                const cardValue = cardNumber.value.trim().replace(/\s/g, '');
+                if (cardValue === '' || cardValue.length < 16) {
+                    setInvalid(cardNumber, cardNumberError, 'Please enter a valid 16-digit card number');
+                } else if (!luhnCheck(cardValue)) {
+                    setInvalid(cardNumber, cardNumberError, 'Please enter a valid card number');
+                } else {
+                    setValid(cardNumber, cardNumberError);
+                }
+                validateForm();
+            });
+            
+            // Validate card name
+            cardName.addEventListener('blur', () => {
+                if (cardName.value.trim() === '') {
+                    setInvalid(cardName, cardNameError, 'Please enter the name on card');
+                } else {
+                    setValid(cardName, cardNameError);
+                }
+                validateForm();
+            });
+            
+            // Validate expiry date
+            expiryDate.addEventListener('blur', () => {
+                const expiryValue = expiryDate.value.trim();
+                if (expiryValue === '' || !isValidExpiryDate(expiryValue)) {
+                    setInvalid(expiryDate, expiryDateError, 'Please enter a valid expiry date (MM/YY)');
+                } else {
+                    setValid(expiryDate, expiryDateError);
+                }
+                validateForm();
+            });
+            
+            // Validate CVV
+            cvv.addEventListener('blur', () => {
+                const cvvValue = cvv.value.trim();
+                if (cvvValue === '' || cvvValue.length < 3) {
+                    setInvalid(cvv, cvvError, 'Please enter a valid 3-digit CVV');
+                } else {
+                    setValid(cvv, cvvError);
+                }
+                validateForm();
+            });
+        }
+        
+        // Set input as invalid
+        function setInvalid(input, errorElement, message) {
+            input.parentElement.classList.add('invalid');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // Set input as valid
+        function setValid(input, errorElement) {
+            input.parentElement.classList.remove('invalid');
+            errorElement.style.display = 'none';
+        }
+        
+        // Validate the entire form
+        function validateForm() {
+            // Check required address fields
+            const isAddressValid = 
+                streetAddress.value.trim() !== '' &&
+                suburb.value.trim() !== '' &&
+                postalCode.value.trim() !== '' &&
+                durbanCBDPostalCodes.includes(postalCode.value.trim()) &&
+                contactNumber.value.trim().replace(/\s/g, '').length === 10;
+            
+            // Check payment method
+            const isPaymentMethodSelected = selectedPaymentMethod !== null;
+            
+            // Check card details if card payment is selected
+            let isCardValid = true;
+            if (selectedPaymentMethod === 'card') {
+                const cardValue = cardNumber.value.trim().replace(/\s/g, '');
+                isCardValid = 
+                    cardValue.length === 16 &&
+                    luhnCheck(cardValue) &&
+                    cardName.value.trim() !== '' &&
+                    isValidExpiryDate(expiryDate.value.trim()) &&
+                    cvv.value.trim().length === 3;
+            }
+            
+            // Determine if form is valid
+            isFormValid = isAddressValid && isPaymentMethodSelected && 
+                         (selectedPaymentMethod === 'cash' || isCardValid);
+            
+            // Enable/disable pay button
+            payBtn.disabled = !isFormValid;
+            
+            return isFormValid;
+        }
+        
+        // Luhn algorithm for card validation
+        function luhnCheck(cardNumber) {
+            let sum = 0;
+            let shouldDouble = false;
+            
+            for (let i = cardNumber.length - 1; i >= 0; i--) {
+                let digit = parseInt(cardNumber.charAt(i));
+                
+                if (shouldDouble) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit -= 9;
+                    }
+                }
+                
+                sum += digit;
+                shouldDouble = !shouldDouble;
+            }
+            
+            return sum % 10 === 0;
+        }
+        
+        // Validate expiry date
+        function isValidExpiryDate(expiry) {
+            if (!expiry.match(/^\d{2}\/\d{2}$/)) return false;
+            
+            const [month, year] = expiry.split('/').map(Number);
+            const currentYear = new Date().getFullYear() % 100;
+            const currentMonth = new Date().getMonth() + 1;
+            
+            if (year < currentYear || year > currentYear + 20) return false;
+            if (year === currentYear && month < currentMonth) return false;
+            if (month < 1 || month > 12) return false;
+            
+            return true;
+        }
+        
+        // Format card number with spaces
+        function formatCardNumber() {
+            let value = this.value.replace(/\s/g, '');
+            if (value.length > 16) value = value.substr(0, 16);
+            
+            let formatted = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            
+            this.value = formatted;
+        }
+        
+        // Format expiry date
+        function formatExpiryDate() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substr(0, 2) + '/' + value.substr(2, 2);
+            }
+            this.value = value;
+        }
+        
+        // Process payment
+        function processPayment() {
+            if (!validateForm()) {
+                showToast('Please fill in all required fields correctly', 'error');
+                return;
+            }
+            
+            // Show loading state
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                // Create order object
+                const order = {
+                    id: generateOrderId(),
+                    date: new Date().toISOString(),
+                    items: [...cart],
+                    total: totalPrice,
+                    deliveryAddress: {
+                        street: streetAddress.value.trim(),
+                        unit: unitNumber.value.trim(),
+                        suburb: suburb.value.trim(),
+                        postalCode: postalCode.value.trim(),
+                        instructions: deliveryInstructions.value.trim()
+                    },
+                    contactNumber: contactNumber.value.trim().replace(/\s/g, ''),
+                    paymentMethod: selectedPaymentMethod,
+                    status: 'Processing',
+                    customer: currentUser ? currentUser.email : 'Guest'
+                };
+                
+                // Save order to localStorage
+                const orders = JSON.parse(localStorage.getItem('orders')) || [];
+                orders.push(order);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                // Clear cart
+                localStorage.removeItem('cart');
+                localStorage.removeItem('totalPrice');
+                
+                // Redirect to receipt page
+                window.location.href = `receipt.html?orderId=${order.id}`;
+            }, 2000);
+        }
+        
+        // Generate random order ID
+        function generateOrderId() {
+            return 'ORD-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        }
+        
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = 'toast';
+            toast.classList.add(type, 'show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the page
+        init();
+    </script>
+</body>
+</html>
